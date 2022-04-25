@@ -1,0 +1,85 @@
+package db
+
+import (
+	"database/sql"
+	"fmt"
+	"github.com/jmoiron/sqlx"
+	"social-media-holding-test-task/internal/handler/rest"
+	"time"
+)
+
+type ipStorage struct {
+	db *sqlx.DB
+}
+
+func NewIpStorage(db *sqlx.DB) *ipStorage {
+	return &ipStorage{db: db}
+}
+
+func (r *ipStorage) CreateUser(chatId int64, nickname string) (int, error) {
+	query := fmt.Sprintf("INSERT INTO %s (nickname, chatID) VALUES ($1, $2) RETURNING id", "users")
+	row := r.db.QueryRowx(query, nickname, chatId)
+
+	var id int
+	err := row.Scan(&id)
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
+
+func (r *ipStorage) GetUser(chatId int64) (bool, int, error) {
+	query := fmt.Sprintf("SELECT id FROM %s WHERE chatID = $1", "users")
+	var id int
+	err := r.db.Get(&id, query, chatId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, 0, nil
+		} else {
+			return false, 0, err
+		}
+	}
+	if id == 0 {
+
+		return false, 0, nil
+
+	}
+	return true, id, nil
+}
+
+func (r *ipStorage) CreateIp(userId int, info rest.IPInfo) error {
+	tx, _ := r.db.Beginx()
+
+	query := fmt.Sprintf("INSERT INTO %s (ip, continent_name, country_name,"+
+		"region_name, city, zip, latitude, longitude) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id", "ip_info")
+	row := tx.QueryRow(query, info.IP, info.Continent, info.Country, info.Region, info.City, info.Zip,
+		info.Latitude, info.Longitude)
+
+	var ipId int
+	err := row.Scan(&ipId)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	query = fmt.Sprintf("INSERT INTO %s (ip_id, user_id) VALUES ($1, $2) RETURNING id",
+		"user_searched_ip")
+	row = tx.QueryRow(query, ipId, userId)
+	var searchedId int
+	err = row.Scan(&searchedId)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	query = fmt.Sprintf("INSERT INTO %s (user_searched_ip_id, timedate) VALUES ($1, $2)", "search_date")
+	row = tx.QueryRow(query, searchedId, time.Now())
+
+	return tx.Commit()
+}
+
+func (r *ipStorage) GetIpsFromUser(chatId int64) ([]rest.IPInfo, error) {
+	fmt.Println("storage logic")
+	return nil, nil
+}
