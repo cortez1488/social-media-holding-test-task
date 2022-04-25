@@ -3,7 +3,7 @@ package ip
 import (
 	"errors"
 	"fmt"
-	"social-media-holding-test-task/internal/handler/rest"
+	"social-media-holding-test-task/structs"
 )
 
 type ipService struct {
@@ -14,7 +14,7 @@ func NewIpService(storage IpStorage) *ipService {
 	return &ipService{storage: storage}
 }
 
-func (s *ipService) ProcessIp(chatID int64, nickname string, ip rest.IPInfo) error {
+func (s *ipService) ProcessIp(chatID int64, nickname string, ip structs.IPInfo) error {
 	exists, id, err := s.storage.GetUser(chatID)
 	if err != nil {
 		return errors.New("s.storage.GetUser: " + err.Error())
@@ -38,11 +38,20 @@ func (s *ipService) ProcessIp(chatID int64, nickname string, ip rest.IPInfo) err
 	return nil
 }
 
-func (s *ipService) GetAllIps(chatID int64) ([]string, error) {
-	result, err := s.storage.GetIpsFromUser(chatID)
+func (s *ipService) GetAllIps(userId int) (structs.UsersRequests, error) {
+	result, err := s.storage.GetIpsFromUser(userId)
 	fmt.Println(result)
 	if err != nil {
-		return nil, errors.New("s.storage.GetIpsFromUser: " + err.Error())
+		return structs.UsersRequests{}, errors.New("s.storage.GetIpsFromUser: " + err.Error())
 	}
-	return []string{}, nil
+	return structs.UsersRequests{}, nil
+}
+
+func (s *ipService) GetUser(chatId int64) (int, error) {
+	_, id, err := s.storage.GetUser(chatId)
+	if err != nil {
+		return 0, errors.New("s.storage.GetUser: " + err.Error())
+	}
+
+	return id, nil
 }
