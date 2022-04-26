@@ -1,7 +1,8 @@
 CREATE TABLE IF NOT EXISTS users(
     id SERIAL PRIMARY KEY,
     nickname VARCHAR(255) NOT NULL,
-    chatID NUMERIC NOT NULL UNIQUE
+    chatID NUMERIC NOT NULL UNIQUE,
+    isAdmin BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS ip_info(
@@ -18,13 +19,13 @@ CREATE TABLE IF NOT EXISTS ip_info(
 
 CREATE TABLE IF NOT EXISTS user_searched_ip(
     id SERIAL PRIMARY KEY,
-    ip_id int REFERENCES ip_info(id),
-    user_id int REFERENCES users(id)
+    ip_id int REFERENCES ip_info(id) ON DELETE CASCADE,
+    user_id int REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS search_date(
     id SERIAL PRIMARY KEY,
-    user_searched_ip_id int REFERENCES user_searched_ip(id),
+    user_searched_ip_id int REFERENCES user_searched_ip(id) ON DELETE CASCADE,
     timedate TIMESTAMP
 );
 

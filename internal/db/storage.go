@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"social-media-holding-test-task/structs"
@@ -52,40 +53,81 @@ func (r *ipStorage) CreateIp(userId int, info structs.IPInfo) error {
 	var err error
 
 	query := fmt.Sprintf("SELECT id FROM %s WHERE ip = $1", "ip_info")
-	var temp int
-	err = r.db.Get(&temp, query, info.IP)
+	var ipId int
+	err = r.db.Get(&ipId, query, info.IP)
 
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
+	if err == nil {
+		tx, _ := r.db.Beginx()
+		searchedId, err := userSearchedIpInsert(tx, ipId, userId)
+		if err != nil {
+			return err
+		}
 
-	tx, _ := r.db.Beginx()
-	query = fmt.Sprintf("INSERT INTO %s (ip, continent_name, country_name,"+
+		err = searchDateInsert(tx, searchedId)
+		if err != nil {
+			return err
+		}
+		return tx.Commit()
+	} else if err == sql.ErrNoRows {
+		tx, _ := r.db.Beginx()
+
+		ipId, err = createNewIp(tx, info)
+		if err != nil {
+			return err
+		}
+
+		searchedId, err := userSearchedIpInsert(tx, ipId, userId)
+		if err != nil {
+			return err
+		}
+
+		err = searchDateInsert(tx, searchedId)
+		if err != nil {
+			return err
+		}
+		return tx.Commit()
+	}
+	return errors.New("Unknown error: " + err.Error())
+}
+
+func createNewIp(tx *sqlx.Tx, info structs.IPInfo) (int, error) {
+	query := fmt.Sprintf("INSERT INTO %s (ip, continent_name, country_name,"+
 		"region_name, city, zip, latitude, longitude) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id", "ip_info")
 	row := tx.QueryRow(query, info.IP, info.Continent, info.Country, info.Region, info.City, info.Zip,
 		info.Latitude, info.Longitude)
 
 	var ipId int
-	err = row.Scan(&ipId)
+	err := row.Scan(&ipId)
 	if err != nil {
 		tx.Rollback()
-		return err
+		return 0, err
 	}
+	return ipId, nil
+}
 
-	query = fmt.Sprintf("INSERT INTO %s (ip_id, user_id) VALUES ($1, $2) RETURNING id",
+func userSearchedIpInsert(tx *sqlx.Tx, ipId, userId int) (int, error) {
+	query := fmt.Sprintf("INSERT INTO %s (ip_id, user_id) VALUES ($1, $2) RETURNING id",
 		"user_searched_ip")
-	row = tx.QueryRow(query, ipId, userId)
+	row := tx.QueryRow(query, ipId, userId)
 	var searchedId int
-	err = row.Scan(&searchedId)
+	err := row.Scan(&searchedId)
 	if err != nil {
 		tx.Rollback()
+		return 0, err
+	}
+	return searchedId, nil
+}
+
+func searchDateInsert(tx *sqlx.Tx, searchedId int) error {
+	query := fmt.Sprintf("INSERT INTO %s (user_searched_ip_id, timedate) VALUES ($1, $2)", "search_date")
+	_, err := tx.Exec(query, searchedId, time.Now())
+	if err != nil {
 		return err
 	}
-
-	query = fmt.Sprintf("INSERT INTO %s (user_searched_ip_id, timedate) VALUES ($1, $2)", "search_date")
-	row = tx.QueryRow(query, searchedId, time.Now())
-
-	return tx.Commit()
+	return nil
 }
 
 type ipDateData struct {

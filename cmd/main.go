@@ -7,13 +7,18 @@ import (
 	_ "github.com/lib/pq"
 	"log"
 	"social-media-holding-test-task/internal/bot"
+	"social-media-holding-test-task/internal/core/admin"
 	"social-media-holding-test-task/internal/core/ip"
 	db2 "social-media-holding-test-task/internal/db"
 )
 
 func main() {
 	db, err := sqlx.Connect("postgres", getPostgresDBConnectString())
+	if err != nil {
+		log.Fatal(err)
+	}
 
+	botAPI, err := tgbotapi.NewBotAPI("5187131287:AAH7x1R1GzEIpOK_RCgz9xieOqjzIRVmhug")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -21,12 +26,10 @@ func main() {
 	ipRepo := db2.NewIpStorage(db)
 	ipService := ip.NewIpService(ipRepo)
 
-	botAPI, err := tgbotapi.NewBotAPI("5187131287:AAH7x1R1GzEIpOK_RCgz9xieOqjzIRVmhug")
-	if err != nil {
-		log.Fatal(err)
-	}
+	admStorage := db2.NewAdminStorage(db)
+	admService := admin.NewAdminService(admStorage)
 
-	telegramBot := bot.NewBot(botAPI, ipService)
+	telegramBot := bot.NewBot(botAPI, ipService, admService)
 	telegramBot.Start()
 }
 

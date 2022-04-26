@@ -7,12 +7,13 @@ import (
 )
 
 type Bot struct {
-	bot     *tgbotapi.BotAPI
-	service IpService
+	bot        *tgbotapi.BotAPI
+	service    IpService
+	admService AdminService
 }
 
-func NewBot(bot *tgbotapi.BotAPI, service IpService) *Bot {
-	return &Bot{bot: bot, service: service}
+func NewBot(bot *tgbotapi.BotAPI, service IpService, admService AdminService) *Bot {
+	return &Bot{bot: bot, service: service, admService: admService}
 }
 
 func (b *Bot) Start() {

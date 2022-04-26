@@ -11,3 +11,11 @@ type IpService interface {
 	GetUser(chatId int64) (int, error)
 	GetIpInfo(ip string) (structs.IPInfo, error)
 }
+
+type AdminService interface {
+	CheckAdminRight(chatId int64) (bool, error)
+	GetAllUsersChatID() ([]int64, error)
+
+	AddAdmin(nickname string) (bool, error)
+	DeleteAdmin(nickname string) (bool, error)
+}

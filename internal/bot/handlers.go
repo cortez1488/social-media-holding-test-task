@@ -14,14 +14,25 @@ func (b *Bot) handleCommand(message *tgbotapi.Message) error {
 		return b.handleStartCommand(message)
 	case "all":
 		return b.handleAllUsersHistory(message)
+	case "admin":
+		b.handleAdminCommand(message)
+	case "sendall":
+		b.handleAdminSendAll(message)
+	//case "admadd":
+	//	b.handleAdminAdd(message)
+	//case "admdelete":
+	//	b.handleAdminDelete(message)
+	//case "checkallrequests":
+	//	b.handleAdminAllRequests(message)
 	default:
 		return b.handleUnknownCommand(message)
 	}
-
+	return nil
 }
 
 func (b *Bot) handleStartCommand(message *tgbotapi.Message) error {
-	msg := tgbotapi.NewMessage(message.Chat.ID, "")
+	msg := tgbotapi.NewMessage(message.Chat.ID, "Привет, присылай ip, я расскажу где ты живешь"+
+		" \n Доступные команды: /all - посмотреть все свои запросы, /admin - админ панель.")
 	_, err := b.bot.Send(msg)
 	if err != nil {
 		return err
@@ -30,7 +41,7 @@ func (b *Bot) handleStartCommand(message *tgbotapi.Message) error {
 }
 
 func (b *Bot) handleUnknownCommand(message *tgbotapi.Message) error {
-	msg := tgbotapi.NewMessage(message.Chat.ID, "")
+	msg := tgbotapi.NewMessage(message.Chat.ID, "я не знаю ч ты хочешь от меня")
 	_, err := b.bot.Send(msg)
 	return err
 }
