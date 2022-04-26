@@ -9,4 +9,5 @@ type IpService interface {
 	GetAllIps(userId int) (structs.UsersRequests, error)
 
 	GetUser(chatId int64) (int, error)
+	GetIpInfo(ip string) (structs.IPInfo, error)
 }

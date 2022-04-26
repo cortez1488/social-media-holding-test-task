@@ -2,7 +2,6 @@ package ip
 
 import (
 	"errors"
-	"fmt"
 	"social-media-holding-test-task/structs"
 )
 
@@ -30,6 +29,7 @@ func (s *ipService) ProcessIp(chatID int64, nickname string, ip structs.IPInfo) 
 		if err != nil {
 			return errors.New("s.storage.CreateUser: " + err.Error())
 		}
+
 		err := s.storage.CreateIp(id, ip)
 		if err != nil {
 			return errors.New("s.storage.CreateIp: " + err.Error())
@@ -40,11 +40,11 @@ func (s *ipService) ProcessIp(chatID int64, nickname string, ip structs.IPInfo) 
 
 func (s *ipService) GetAllIps(userId int) (structs.UsersRequests, error) {
 	result, err := s.storage.GetIpsFromUser(userId)
-	fmt.Println(result)
+
 	if err != nil {
 		return structs.UsersRequests{}, errors.New("s.storage.GetIpsFromUser: " + err.Error())
 	}
-	return structs.UsersRequests{}, nil
+	return result, nil
 }
 
 func (s *ipService) GetUser(chatId int64) (int, error) {
@@ -54,4 +54,8 @@ func (s *ipService) GetUser(chatId int64) (int, error) {
 	}
 
 	return id, nil
+}
+
+func (s *ipService) GetIpInfo(ip string) (structs.IPInfo, error) {
+	return s.storage.GetIpInfo(ip)
 }

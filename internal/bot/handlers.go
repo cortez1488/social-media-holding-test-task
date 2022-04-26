@@ -3,6 +3,7 @@ package bot
 import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"log"
 	"social-media-holding-test-task/internal/handler/rest"
 	"social-media-holding-test-task/structs"
 )
@@ -46,8 +47,8 @@ func (b *Bot) handleIp(message *tgbotapi.Message) error {
 }
 
 func getMessage(chatID int64, ip structs.IPInfo) tgbotapi.MessageConfig {
-	rawString := fmt.Sprintf("your continent: %s, your country: %s, your region: %s, your city: %s, your zip: %s",
-		ip.Continent, ip.Country, ip.Region, ip.City, ip.Zip, ip.Longitude, ip.Longitude)
+	rawString := fmt.Sprintf("your continent: %s, your country: %s, your region: %s, your city: %s, your zip: %s, your latitude: %s, your langirude: %s",
+		ip.Continent, ip.Country, ip.Region, ip.City, ip.Zip, ip.Latitude, ip.Longitude)
 	return tgbotapi.NewMessage(chatID, rawString)
 }
 
@@ -58,9 +59,34 @@ func (b *Bot) handleAllUsersHistory(message *tgbotapi.Message) error {
 	}
 
 	result, err := b.service.GetAllIps(id)
-	fmt.Println(result)
 	if err != nil {
 		return err
 	}
+
+	msg := tgbotapi.NewMessage(message.Chat.ID, b.getAllUsersHistoryMessage(result))
+	_, err = b.bot.Send(msg)
+	if err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func (b *Bot) getAllUsersHistoryMessage(result structs.UsersRequests) string {
+	responseStr := fmt.Sprint("")
+	for ipStr, dates := range result.Ips {
+		responseStr += fmt.Sprintf("Ip : %s ", ipStr)
+		ip, err := b.service.GetIpInfo(ipStr)
+		if err != nil {
+			log.Fatal(err)
+		}
+		responseStr += fmt.Sprintf("Result: \n continent: %s, country: %s, region: %s, city: %s \n",
+			ip.Continent, ip.Country, ip.Region, ip.City)
+		responseStr += fmt.Sprintf("Request times:\n")
+
+		for ix, date := range dates {
+			responseStr += fmt.Sprintf("%d - %s\n", ix+1, date)
+		}
+	}
+	return responseStr
 }
