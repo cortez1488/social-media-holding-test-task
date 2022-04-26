@@ -14,23 +14,23 @@ func NewIpService(storage IpStorage) *ipService {
 }
 
 func (s *ipService) ProcessIp(chatID int64, nickname string, ip structs.IPInfo) error {
-	exists, id, err := s.storage.GetUser(chatID)
+	exists, user, err := s.storage.GetUser(chatID)
 	if err != nil {
 		return errors.New("s.storage.GetUser: " + err.Error())
 	}
 	if exists {
-		err := s.storage.CreateIp(id, ip)
+		err := s.storage.CreateIp(user.Id, ip)
 		if err != nil {
 			return errors.New("s.storage.CreateIp: " + err.Error())
 		}
 
 	} else {
-		id, err = s.storage.CreateUser(chatID, nickname)
+		id, err := s.storage.CreateUser(chatID, nickname)
 		if err != nil {
 			return errors.New("s.storage.CreateUser: " + err.Error())
 		}
 
-		err := s.storage.CreateIp(id, ip)
+		err = s.storage.CreateIp(id, ip)
 		if err != nil {
 			return errors.New("s.storage.CreateIp: " + err.Error())
 		}
@@ -47,13 +47,13 @@ func (s *ipService) GetAllIps(userId int) (structs.UsersRequests, error) {
 	return result, nil
 }
 
-func (s *ipService) GetUser(chatId int64) (int, error) {
-	_, id, err := s.storage.GetUser(chatId)
+func (s *ipService) GetUser(chatId int64) (structs.User, error) {
+	_, user, err := s.storage.GetUser(chatId)
 	if err != nil {
-		return 0, errors.New("s.storage.GetUser: " + err.Error())
+		return structs.User{}, errors.New("s.storage.GetUser: " + err.Error())
 	}
 
-	return id, nil
+	return user, nil
 }
 
 func (s *ipService) GetIpInfo(ip string) (structs.IPInfo, error) {

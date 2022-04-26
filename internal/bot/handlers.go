@@ -15,19 +15,18 @@ func (b *Bot) handleCommand(message *tgbotapi.Message) error {
 	case "all":
 		return b.handleAllUsersHistory(message)
 	case "admin":
-		b.handleAdminCommand(message)
+		return b.handleAdminCommand(message)
 	case "sendall":
-		b.handleAdminSendAll(message)
-	//case "admadd":
-	//	b.handleAdminAdd(message)
-	//case "admdelete":
-	//	b.handleAdminDelete(message)
-	//case "checkallrequests":
-	//	b.handleAdminAllRequests(message)
+		return b.handleAdminSendAll(message)
+	case "admadd":
+		return b.handleAdminAdd(message)
+	case "admdelete":
+		return b.handleAdminDelete(message)
+	case "checkallrequests":
+		return b.handleAdminAllRequests(message)
 	default:
 		return b.handleUnknownCommand(message)
 	}
-	return nil
 }
 
 func (b *Bot) handleStartCommand(message *tgbotapi.Message) error {
@@ -64,12 +63,12 @@ func getMessage(chatID int64, ip structs.IPInfo) tgbotapi.MessageConfig {
 }
 
 func (b *Bot) handleAllUsersHistory(message *tgbotapi.Message) error {
-	id, err := b.service.GetUser(message.Chat.ID)
+	user, err := b.service.GetUser(message.Chat.ID)
 	if err != nil {
 		return err
 	}
 
-	result, err := b.service.GetAllIps(id)
+	result, err := b.service.GetAllIps(user.Id)
 	if err != nil {
 		return err
 	}

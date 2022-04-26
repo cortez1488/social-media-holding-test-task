@@ -53,3 +53,13 @@ func (r *adminStorage) DeleteAdmin(nickname string) (bool, error) {
 	}
 	return true, nil
 }
+
+func (r *adminStorage) GetIdFromNickname(nickname string) (int, error) {
+	query := fmt.Sprintf("SELECT id FROM users WHERE nickname = $1")
+	var id int
+	err := r.db.Get(&id, query, nickname)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
+}

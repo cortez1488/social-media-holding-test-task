@@ -21,3 +21,7 @@ func (s *AdminService) AddAdmin(nickname string) (bool, error) {
 func (s *AdminService) DeleteAdmin(nickname string) (bool, error) {
 	return s.storage.DeleteAdmin(nickname)
 }
+
+func (s *AdminService) GetIdFromNickname(nickname string) (int, error) {
+	return s.storage.GetIdFromNickname(nickname)
+}

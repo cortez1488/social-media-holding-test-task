@@ -6,4 +6,6 @@ type AdminStorage interface {
 
 	AddAdmin(nickname string) (bool, error)
 	DeleteAdmin(nickname string) (bool, error)
+
+	GetIdFromNickname(nickname string) (int, error)
 }

@@ -30,23 +30,18 @@ func (r *ipStorage) CreateUser(chatId int64, nickname string) (int, error) {
 	return id, nil
 }
 
-func (r *ipStorage) GetUser(chatId int64) (bool, int, error) {
-	query := fmt.Sprintf("SELECT id FROM %s WHERE chatID = $1", "users")
-	var id int
-	err := r.db.Get(&id, query, chatId)
+func (r *ipStorage) GetUser(chatId int64) (bool, structs.User, error) {
+	query := fmt.Sprintf("SELECT * FROM %s WHERE chatID = $1", "users")
+	var user structs.User
+	err := r.db.Get(&user, query, chatId)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return false, 0, nil
+			return false, structs.User{}, nil
 		} else {
-			return false, 0, err
+			return false, structs.User{}, err
 		}
 	}
-	if id == 0 {
-
-		return false, 0, nil
-
-	}
-	return true, id, nil
+	return true, user, nil
 }
 
 func (r *ipStorage) CreateIp(userId int, info structs.IPInfo) error {

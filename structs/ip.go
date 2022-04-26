@@ -2,6 +2,13 @@ package structs
 
 import "time"
 
+type User struct {
+	Id       int    `db:"id"`
+	Nickname string `db:"nickname"`
+	ChatID   int64  `db:"chatid"`
+	IsAdmin  bool   `db:"isadmin"`
+}
+
 type IPInfo struct {
 	Id        int     `db:"id"`
 	IP        string  `json:"ip" db:"ip"`
