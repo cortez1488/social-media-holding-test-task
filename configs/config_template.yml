@@ -1,0 +1,13 @@
+ipapi: "http://api.ipstack.com/"
+access_key:
+
+tg_token:
+
+db:
+  postgres:
+    drivername:
+    username:
+    password:
+    dbname:
+    sslmode:
+    port:
