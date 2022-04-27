@@ -6,6 +6,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"github.com/spf13/viper"
 	"log"
 	"social-media-holding-test-task/internal/bot"
 	"social-media-holding-test-task/internal/core/admin"
@@ -16,12 +17,16 @@ import (
 )
 
 func main() {
+
+	viper.AddConfigPath("configs")
+	viper.SetConfigName("config")
+
 	db, err := sqlx.Connect("postgres", getPostgresDBConnectString())
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	botAPI, err := tgbotapi.NewBotAPI("5187131287:AAH7x1R1GzEIpOK_RCgz9xieOqjzIRVmhug")
+	botAPI, err := tgbotapi.NewBotAPI(viper.Get("tg_token").(string))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -50,6 +55,13 @@ func runServer(server *gin.Engine) {
 		log.Fatal("server: " + err.Error())
 	}
 }
+
+//func getPostgresDBConnectString() string {
+//	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+//		os.Getenv("DB_HOST"), viper.Get("db.postgres.port"),
+//		viper.Get("db.postgres.username"), viper.Get("db.postgres.password"),
+//		viper.Get("db.postgres.dbname"), viper.Get("db.postgres.sslmode"))
+//}
 
 func getPostgresDBConnectString() string {
 	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", "localhost", "5436",

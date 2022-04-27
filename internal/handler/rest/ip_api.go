@@ -3,14 +3,15 @@ package rest
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/spf13/viper"
 	"io"
 	"log"
 	"net/http"
 	"social-media-holding-test-task/structs"
 )
 
-const APIIURI = "http://api.ipstack.com/"
-const ACCESS_KEY = "23608c246cd680f479368fab5a2ceea2"
+var APIIURI = viper.Get("ipapi").(string)
+var ACCESS_KEY = viper.Get("access_key").(string)
 
 func GetIpInfo(ip string) structs.IPInfo {
 	uri := getFullUri(APIIURI, ip, ACCESS_KEY)

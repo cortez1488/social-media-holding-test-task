@@ -40,7 +40,7 @@ func (b *Bot) handleStartCommand(message *tgbotapi.Message) error {
 }
 
 func (b *Bot) handleUnknownCommand(message *tgbotapi.Message) error {
-	msg := tgbotapi.NewMessage(message.Chat.ID, "я не знаю ч ты хочешь от меня")
+	msg := tgbotapi.NewMessage(message.Chat.ID, "Я не знаю чего ты хочешь от меня.")
 	_, err := b.bot.Send(msg)
 	return err
 }
