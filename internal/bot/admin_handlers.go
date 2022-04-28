@@ -121,9 +121,12 @@ func (b *Bot) handleAdminAllRequests(message *tgbotapi.Message) error {
 		}
 		id, err := b.admService.GetIdFromNickname(nickname)
 		if err != nil {
-			return err
+			return errors.New("b.admService.GetIdFromNickname: " + err.Error())
 		}
 		data, err := b.service.GetAllIps(id)
+		if err != nil {
+			return errors.New("b.service.GetAllIps: " + err.Error())
+		}
 		msg := tgbotapi.NewMessage(message.Chat.ID, b.getAllUsersHistoryMessage(data))
 		_, err = b.bot.Send(msg)
 		if err != nil {

@@ -5,9 +5,9 @@ tg_token:
 
 db:
   postgres:
-    drivername:
-    username:
-    password:
-    dbname:
-    sslmode:
-    port:
+    drivername: "postgres"
+    username: "postgres"
+    password: "qwerty"
+    dbname: "postgres"
+    sslmode: "disable"
+    port: "5432"

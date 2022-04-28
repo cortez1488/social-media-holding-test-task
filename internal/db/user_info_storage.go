@@ -1,6 +1,7 @@
 package db
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"social-media-holding-test-task/structs"
@@ -29,6 +30,9 @@ func (r *userInfoStorage) GetUser(id int) (structs.User, error) {
 	var data structs.User
 	err := r.db.Get(&data, query, id)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return structs.User{}, nil
+		}
 		return structs.User{}, err
 	}
 

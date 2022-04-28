@@ -57,7 +57,8 @@ func (b *Bot) handleIp(message *tgbotapi.Message) error {
 }
 
 func getMessage(chatID int64, ip structs.IPInfo) tgbotapi.MessageConfig {
-	rawString := fmt.Sprintf("your continent: %s, your country: %s, your region: %s, your city: %s, your zip: %s, your latitude: %s, your langirude: %s",
+	rawString := fmt.Sprintf("your continent: %s, your country: %s, your region: %s, your city: %s, your zip: %s,"+
+		" your latitude: %f, your longitude: %f",
 		ip.Continent, ip.Country, ip.Region, ip.City, ip.Zip, ip.Latitude, ip.Longitude)
 	return tgbotapi.NewMessage(chatID, rawString)
 }
@@ -83,16 +84,16 @@ func (b *Bot) handleAllUsersHistory(message *tgbotapi.Message) error {
 }
 
 func (b *Bot) getAllUsersHistoryMessage(result structs.UsersRequests) string {
-	responseStr := fmt.Sprint("")
+	responseStr := fmt.Sprint("Запросы:")
 	for ipStr, dates := range result.Ips {
 		responseStr += fmt.Sprintf("Ip : %s ", ipStr)
 		ip, err := b.service.GetIpInfo(ipStr)
 		if err != nil {
 			log.Fatal(err)
 		}
-		responseStr += fmt.Sprintf("Result: \n continent: %s, country: %s, region: %s, city: %s \n",
+		responseStr += fmt.Sprintf("Результат: \n continent: %s, country: %s, region: %s, city: %s \n",
 			ip.Continent, ip.Country, ip.Region, ip.City)
-		responseStr += fmt.Sprintf("Request times:\n")
+		responseStr += fmt.Sprintf("Время запроса:\n")
 
 		for ix, date := range dates {
 			responseStr += fmt.Sprintf("%d - %s\n", ix+1, date)

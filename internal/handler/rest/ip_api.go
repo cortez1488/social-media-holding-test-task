@@ -10,11 +10,8 @@ import (
 	"social-media-holding-test-task/structs"
 )
 
-var APIIURI = viper.Get("ipapi").(string)
-var ACCESS_KEY = viper.Get("access_key").(string)
-
 func GetIpInfo(ip string) structs.IPInfo {
-	uri := getFullUri(APIIURI, ip, ACCESS_KEY)
+	uri := getFullUri(viper.GetString("api.ipapi"), ip, viper.GetString("api.access_key"))
 	resp, err := http.Get(uri)
 	if err != nil {
 		log.Fatalln("Request to API doesn't work " + err.Error())

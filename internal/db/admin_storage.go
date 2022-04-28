@@ -32,6 +32,9 @@ func (r *adminStorage) GetAllUsersChatID() ([]int64, error) {
 	var result []int64
 	err := r.db.Select(&result, query)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, err
 	}
 	return result, err
@@ -59,6 +62,9 @@ func (r *adminStorage) GetIdFromNickname(nickname string) (int, error) {
 	var id int
 	err := r.db.Get(&id, query, nickname)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0, nil
+		}
 		return 0, err
 	}
 	return id, nil
