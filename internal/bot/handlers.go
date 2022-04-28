@@ -3,7 +3,6 @@ package bot
 import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"log"
 	"social-media-holding-test-task/internal/handler/rest"
 	"social-media-holding-test-task/structs"
 )
@@ -74,7 +73,11 @@ func (b *Bot) handleAllUsersHistory(message *tgbotapi.Message) error {
 		return err
 	}
 
-	msg := tgbotapi.NewMessage(message.Chat.ID, b.getAllUsersHistoryMessage(result))
+	rawMsg, err := b.getAllUsersHistoryMessage(result)
+	if err != nil {
+		return err
+	}
+	msg := tgbotapi.NewMessage(message.Chat.ID, rawMsg)
 	_, err = b.bot.Send(msg)
 	if err != nil {
 		return err
@@ -83,13 +86,13 @@ func (b *Bot) handleAllUsersHistory(message *tgbotapi.Message) error {
 	return nil
 }
 
-func (b *Bot) getAllUsersHistoryMessage(result structs.UsersRequests) string {
+func (b *Bot) getAllUsersHistoryMessage(result structs.UsersRequests) (string, error) {
 	responseStr := fmt.Sprint("Запросы:")
 	for ipStr, dates := range result.Ips {
 		responseStr += fmt.Sprintf("Ip : %s ", ipStr)
 		ip, err := b.service.GetIpInfo(ipStr)
 		if err != nil {
-			log.Fatal(err)
+			return "", err
 		}
 		responseStr += fmt.Sprintf("Результат: \n continent: %s, country: %s, region: %s, city: %s \n",
 			ip.Continent, ip.Country, ip.Region, ip.City)
@@ -99,5 +102,5 @@ func (b *Bot) getAllUsersHistoryMessage(result structs.UsersRequests) string {
 			responseStr += fmt.Sprintf("%d - %s\n", ix+1, date)
 		}
 	}
-	return responseStr
+	return responseStr, nil
 }

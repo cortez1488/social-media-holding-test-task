@@ -11,3 +11,4 @@ db:
     dbname: "postgres"
     sslmode: "disable"
     port: "5432"
+  connect_attempts: 5

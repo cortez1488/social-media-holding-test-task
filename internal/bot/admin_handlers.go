@@ -3,7 +3,6 @@ package bot
 import (
 	"errors"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"log"
 	"strings"
 )
 
@@ -20,7 +19,7 @@ func (b *Bot) handleAdminCommand(message *tgbotapi.Message) error {
 			"-Вывести все айпи что проверял пользователь /checkallrequests [никнейм юзера]")
 		_, err := b.bot.Send(msg)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
 	return nil
@@ -41,13 +40,13 @@ func (b *Bot) handleAdminSendAll(message *tgbotapi.Message) error {
 		}
 		chats, err := b.admService.GetAllUsersChatID()
 		if err != nil {
-			log.Fatal(errors.New("b.admService.GetAllUsersChatID: " + err.Error()))
+			return errors.New("b.admService.GetAllUsersChatID: " + err.Error())
 		}
 		for _, chat := range chats {
 			msg := tgbotapi.NewMessage(chat, admRawMessage)
 			_, err := b.bot.Send(msg)
 			if err != nil {
-				log.Fatal(errors.New("b.admService.GetAllUsersChatID: " + err.Error()))
+				return errors.New("b.admService.GetAllUsersChatID: " + err.Error())
 			}
 		}
 	}
@@ -127,7 +126,11 @@ func (b *Bot) handleAdminAllRequests(message *tgbotapi.Message) error {
 		if err != nil {
 			return errors.New("b.service.GetAllIps: " + err.Error())
 		}
-		msg := tgbotapi.NewMessage(message.Chat.ID, b.getAllUsersHistoryMessage(data))
+		rawMsg, err := b.getAllUsersHistoryMessage(data)
+		if err != nil {
+			return err
+		}
+		msg := tgbotapi.NewMessage(message.Chat.ID, rawMsg)
 		_, err = b.bot.Send(msg)
 		if err != nil {
 			return err
