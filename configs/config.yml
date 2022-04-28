@@ -1,0 +1,14 @@
+
+api:
+  ipapi: "http://api.ipstack.com/"
+  access_key: "23608c246cd680f479368fab5a2ceea2"
+tg_token: "5187131287:AAH7x1R1GzEIpOK_RCgz9xieOqjzIRVmhug"
+
+db:
+  postgres:
+    drivername: "postgres"
+    username: "postgres"
+    password: "qwerty"
+    dbname: "postgres"
+    sslmode: "disable"
+    port: "5432"
