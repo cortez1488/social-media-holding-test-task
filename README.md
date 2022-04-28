@@ -20,11 +20,11 @@
 ---
 **Запуск:**
 1. В директории configs: 
- > Создать файл config.yml по шаблону config_template.yml
- > Заполнить поле access_key(ключ доступа от ipstack) 
- > Заполнить поле tg_token (токен вашего telegram бота)
+ + Создать файл config.yml по шаблону config_template.yml
+ + Заполнить поле access_key(ключ доступа от ipstack) 
+ + Заполнить поле tg_token (токен вашего telegram бота)
 2. В директории проекта
- > docker-compose build && docker-compose up
+ + docker-compose build && docker-compose up
 
 ---
 **При ошибках:**
