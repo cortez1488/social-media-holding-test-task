@@ -20,7 +20,7 @@ func (b *Bot) Start() {
 	updates := b.initUpdates()
 	err := b.handleFunc(updates)
 	if err != nil {
-		logrus.Fatal(err)
+		logrus.Error(err)
 	}
 }
 
