@@ -2,7 +2,7 @@ package bot
 
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"log"
+	"github.com/sirupsen/logrus"
 	"regexp"
 )
 
@@ -20,7 +20,7 @@ func (b *Bot) Start() {
 	updates := b.initUpdates()
 	err := b.handleFunc(updates)
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 }
 

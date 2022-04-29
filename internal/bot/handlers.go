@@ -33,6 +33,7 @@ func (b *Bot) handleStartCommand(message *tgbotapi.Message) error {
 		" \n Доступные команды: /all - посмотреть все свои запросы, /admin - админ панель.")
 	_, err := b.bot.Send(msg)
 	if err != nil {
+		b.sendErrorMessage(message.Chat.ID)
 		return err
 	}
 	return nil
@@ -41,6 +42,9 @@ func (b *Bot) handleStartCommand(message *tgbotapi.Message) error {
 func (b *Bot) handleUnknownCommand(message *tgbotapi.Message) error {
 	msg := tgbotapi.NewMessage(message.Chat.ID, "Я не знаю чего ты хочешь от меня.")
 	_, err := b.bot.Send(msg)
+	if err != nil {
+		b.sendErrorMessage(message.Chat.ID)
+	}
 	return err
 }
 
@@ -49,6 +53,7 @@ func (b *Bot) handleIp(message *tgbotapi.Message) error {
 	msg := getMessage(message.Chat.ID, ipInfo)
 	_, err := b.bot.Send(msg)
 	if err != nil {
+		b.sendErrorMessage(message.Chat.ID)
 		return err
 	}
 	return b.service.ProcessIp(message.Chat.ID, message.Chat.FirstName, ipInfo)
@@ -65,21 +70,25 @@ func getMessage(chatID int64, ip structs.IPInfo) tgbotapi.MessageConfig {
 func (b *Bot) handleAllUsersHistory(message *tgbotapi.Message) error {
 	user, err := b.service.GetUser(message.Chat.ID)
 	if err != nil {
+		b.sendErrorMessage(message.Chat.ID)
 		return err
 	}
 
 	result, err := b.service.GetAllIps(user.Id)
 	if err != nil {
+		b.sendErrorMessage(message.Chat.ID)
 		return err
 	}
 
 	rawMsg, err := b.getAllUsersHistoryMessage(result)
 	if err != nil {
+		b.sendErrorMessage(message.Chat.ID)
 		return err
 	}
 	msg := tgbotapi.NewMessage(message.Chat.ID, rawMsg)
 	_, err = b.bot.Send(msg)
 	if err != nil {
+		b.sendErrorMessage(message.Chat.ID)
 		return err
 	}
 
@@ -87,7 +96,7 @@ func (b *Bot) handleAllUsersHistory(message *tgbotapi.Message) error {
 }
 
 func (b *Bot) getAllUsersHistoryMessage(result structs.UsersRequests) (string, error) {
-	responseStr := fmt.Sprint("Запросы:")
+	responseStr := fmt.Sprint("Запросы:\n")
 	for ipStr, dates := range result.Ips {
 		responseStr += fmt.Sprintf("Ip : %s ", ipStr)
 		ip, err := b.service.GetIpInfo(ipStr)
@@ -103,4 +112,8 @@ func (b *Bot) getAllUsersHistoryMessage(result structs.UsersRequests) (string, e
 		}
 	}
 	return responseStr, nil
+}
+
+func (b *Bot) sendErrorMessage(chatID int64) {
+	tgbotapi.NewMessage(chatID, "Ошибка сервиса. Попробуйте еще раз.")
 }
