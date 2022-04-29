@@ -40,7 +40,7 @@ func (b *Bot) handleAdminSendAll(message *tgbotapi.Message) error {
 				return nil
 			}
 			b.sendErrorMessage(message.Chat.ID)
-			return err
+			return errors.New(" b.getAdminMessageArgument: " + err.Error())
 		}
 		chats, err := b.admService.GetAllUsersChatID()
 		if err != nil {
@@ -72,7 +72,7 @@ func (b *Bot) handleAdminAdd(message *tgbotapi.Message) error {
 				return nil
 			}
 			b.sendErrorMessage(message.Chat.ID)
-			return err
+			return errors.New(" b.getAdminOneArgument: " + err.Error())
 		}
 		_, err = b.admService.AddAdmin(nickname)
 		if err != nil {
@@ -102,7 +102,7 @@ func (b *Bot) handleAdminDelete(message *tgbotapi.Message) error {
 				return nil
 			}
 			b.sendErrorMessage(message.Chat.ID)
-			return err
+			return errors.New(" b.getAdminOneArgument: " + err.Error())
 		}
 		_, err = b.admService.DeleteAdmin(nickname)
 		if err != nil {
@@ -123,7 +123,7 @@ func (b *Bot) handleAdminAllRequests(message *tgbotapi.Message) error {
 	admin, err := b.checkAdmin(message)
 	if err != nil {
 		b.sendErrorMessage(message.Chat.ID)
-		return err
+		return errors.New("b.sendErrorMessage: " + err.Error())
 	}
 	if admin {
 		nickname, err := b.getAdminOneArgument(message)
@@ -132,7 +132,7 @@ func (b *Bot) handleAdminAllRequests(message *tgbotapi.Message) error {
 				return nil
 			}
 			b.sendErrorMessage(message.Chat.ID)
-			return err
+			return errors.New("b.getAllUsersHistoryMessage: " + err.Error())
 		}
 		id, err := b.admService.GetIdFromNickname(nickname)
 		if err != nil {
@@ -147,7 +147,7 @@ func (b *Bot) handleAdminAllRequests(message *tgbotapi.Message) error {
 		rawMsg, err := b.getAllUsersHistoryMessage(data)
 		if err != nil {
 			b.sendErrorMessage(message.Chat.ID)
-			return err
+			return errors.New("b.getAllUsersHistoryMessage: " + err.Error())
 		}
 		msg := tgbotapi.NewMessage(message.Chat.ID, rawMsg)
 		_, err = b.bot.Send(msg)
